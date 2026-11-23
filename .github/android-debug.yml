@@ -1,0 +1,44 @@
+# Manual debug build only. No release signing, no secrets, no publishing.
+# Run it yourself from the Actions tab (Run workflow). The APK is kept as a run artifact in YOUR repo
+# (private repo: visible only to people with access) and expires after 7 days.
+# Running it uses your GitHub account's Actions minutes/quota and is subject to your GitHub terms.
+name: Android debug build
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install Android SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0"
+      - run: npm ci
+      - run: npm --prefix frontend ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fixmanager-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
