@@ -1,0 +1,43 @@
+{
+  "name": "maintenance-shop",
+  "private": true,
+  "type": "module",
+  "version": "0.5.5",
+  "scripts": {
+    "install:all": "npm install && npm --prefix frontend install",
+    "dev:api": "tsx backend/src/dev/dev-server.ts",
+    "dev:ui": "npm --prefix frontend run dev",
+    "typecheck": "tsc -p backend/tsconfig.check.json && npm --prefix frontend run typecheck && tsc -p frontend/tsconfig.android.json",
+    "test": "node scripts-android/test.mjs",
+    "build": "npm run build:android",
+    "build:android": "npm --prefix frontend run build:android && npx cap sync android",
+    "apk:debug": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.1",
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/app-launcher": "^8.0.1",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/device": "^8.0.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
+    "@noble/hashes": "^2.4.0",
+    "better-sqlite3-multiple-ciphers": "^13.0.3",
+    "express": "^5.2.1",
+    "pino": "^10.4.0",
+    "scryptsy": "^2.1.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.3",
+    "esbuild": "^0.28.0",
+    "puppeteer-core": "^25.18.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "productName": "FixManager",
+  "description": "Maintenance shop manager",
+  "author": "Shop"
+}
